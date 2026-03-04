@@ -179,7 +179,7 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 	if !force {
 		devEnv, envErr := cfg.LoadEnvironment("dev")
 		if envErr == nil && devEnv.Namespace != "" {
-			fmt.Fprintln(w, "Running pre-deploy live test in dev environment...")
+			_, _ = fmt.Fprintln(w, "Running pre-deploy live test in dev environment...")
 			liveOpts := InternalDeployOptions{
 				Namespace:    devEnv.Namespace,
 				Image:        imageTag,
@@ -205,7 +205,7 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 					return fmt.Errorf("pre-deploy live test: workflow returned success=false (use --force to skip)")
 				}
 			}
-			fmt.Fprintln(w, "  Pre-deploy live test passed")
+			_, _ = fmt.Fprintln(w, "  Pre-deploy live test passed")
 		}
 	}
 
@@ -224,7 +224,7 @@ func runDeploy(cmd *cobra.Command, args []string) error {
 
 	// Post-deploy verification
 	if verify {
-		fmt.Fprintln(w, "Verifying deployment...")
+		_, _ = fmt.Fprintln(w, "Verifying deployment...")
 		runResult, runErr := deployResult.MCPClient.WfRun(cmd.Context(), deployResult.Namespace, deployResult.WorkflowName, nil, 120)
 		if runErr != nil {
 			return emitDeployResult(cmd, "fail", "verification: workflow run failed: "+runErr.Error(), nil, startedAt)
@@ -313,7 +313,7 @@ func buildManifests(workflowDir string, wf *spec.Workflow, opts InternalDeployOp
 				if sd.Version != "" {
 					versionHint = "@" + sd.Version
 				}
-				fmt.Fprintf(w, "  Module proxy: auto-detected %s:%s%s from TypeScript (declare in contract to pin version)\n",
+				_, _ = fmt.Fprintf(w, "  Module proxy: auto-detected %s:%s%s from TypeScript (declare in contract to pin version)\n",
 					sd.Protocol, sd.Host, versionHint)
 			}
 		}
@@ -328,7 +328,7 @@ func buildManifests(workflowDir string, wf *spec.Workflow, opts InternalDeployOp
 	// Detect kind cluster and adjust defaults
 	kindInfo, _ := k8s.DetectKindCluster()
 	if kindInfo != nil && kindInfo.IsKind {
-		fmt.Fprintf(w, "  Detected kind cluster '%s', adjusted: no gVisor, imagePullPolicy=IfNotPresent\n", kindInfo.ClusterName)
+		_, _ = fmt.Fprintf(w, "  Detected kind cluster '%s', adjusted: no gVisor, imagePullPolicy=IfNotPresent\n", kindInfo.ClusterName)
 		runtimeClass = ""
 		if imagePullPolicy == "" {
 			imagePullPolicy = "IfNotPresent"
@@ -363,9 +363,9 @@ func buildManifests(workflowDir string, wf *spec.Workflow, opts InternalDeployOp
 		manifests = append(manifests, *importMap)
 		wfDeps := countModuleProxyDeps(wf)
 		if wfDeps > 0 {
-			fmt.Fprintf(w, "  Module proxy: import map generated (%d jsr/npm workflow deps + engine deps)\n", wfDeps)
+			_, _ = fmt.Fprintf(w, "  Module proxy: import map generated (%d jsr/npm workflow deps + engine deps)\n", wfDeps)
 		} else {
-			fmt.Fprintf(w, "  Module proxy: import map generated (engine deps)\n")
+			_, _ = fmt.Fprintf(w, "  Module proxy: import map generated (engine deps)\n")
 		}
 	}
 

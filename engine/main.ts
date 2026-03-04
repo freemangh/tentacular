@@ -17,7 +17,7 @@ import type { Context, WorkflowSpec } from "./types.ts";
 import { compile } from "./compiler/mod.ts";
 import { createContext } from "./context/mod.ts";
 import { resolveSecrets } from "./context/cascade.ts";
-import { loadAllNodes, clearModuleCache } from "./loader.ts";
+import { clearModuleCache, loadAllNodes } from "./loader.ts";
 import { startServer } from "./server.ts";
 import { watchFiles } from "./watcher.ts";
 import type { NodeRunner } from "./executor/types.ts";
@@ -107,7 +107,9 @@ async function main() {
       const value = parseInt(match[1]!, 10);
       timeoutMs = match[2] === "m" ? value * 60_000 : value * 1_000;
     } else {
-      console.warn(`Invalid timeout format "${spec.config.timeout}" — expected "<number>s" or "<number>m". Using default 30s.`);
+      console.warn(
+        `Invalid timeout format "${spec.config.timeout}" — expected "<number>s" or "<number>m". Using default 30s.`,
+      );
     }
   }
 
@@ -115,8 +117,8 @@ async function main() {
   // trigger is actually declared. Reading Deno.env unconditionally crashes pods
   // that run without --allow-env (e.g. cron/queue workflows under gVisor).
   const hasWebhookTrigger = spec.triggers.some((t) => t.type === "webhook");
-  const secretWebhookSecret =
-    (secrets["github"] as Record<string, string> | undefined)?.["webhook_secret"];
+  const secretWebhookSecret = (secrets["github"] as Record<string, string> | undefined)
+    ?.["webhook_secret"];
   const webhookSecret = secretWebhookSecret ??
     (hasWebhookTrigger ? Deno.env.get("WEBHOOK_SECRET") : undefined);
 
@@ -158,7 +160,9 @@ async function main() {
     if (!natsUrl) {
       console.warn("Queue triggers defined but config.nats_url is not set — skipping NATS setup");
     } else if (!natsToken) {
-      console.warn("Queue triggers defined but secrets.nats.token is not set — skipping NATS setup");
+      console.warn(
+        "Queue triggers defined but secrets.nats.token is not set — skipping NATS setup",
+      );
     } else {
       try {
         const { startNATSTriggers } = await import("./triggers/nats.ts");

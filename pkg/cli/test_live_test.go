@@ -270,8 +270,8 @@ func TestLiveTestRequiresWorkflowYAML(t *testing.T) {
 	// Set up environment config so ResolveEnvironment doesn't fail first
 	origHome := os.Getenv("HOME")
 	tmpHome := t.TempDir()
-	os.Setenv("HOME", tmpHome)
-	defer os.Setenv("HOME", origHome)
+	_ = os.Setenv("HOME", tmpHome)
+	defer func() { _ = os.Setenv("HOME", origHome) }()
 
 	userDir := filepath.Join(tmpHome, ".tentacular")
 	_ = os.MkdirAll(userDir, 0o755)

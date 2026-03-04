@@ -9,7 +9,15 @@
 export type { Context, Logger, NodeFunction, NodeModule } from "./types.ts";
 
 // Execution types (for advanced users)
-export type { CompiledDAG, Stage, ExecutionResult, WorkflowSpec, NodeSpec, Edge, Trigger } from "./types.ts";
+export type {
+  CompiledDAG,
+  Edge,
+  ExecutionResult,
+  NodeSpec,
+  Stage,
+  Trigger,
+  WorkflowSpec,
+} from "./types.ts";
 
 // Executor interface (for extending)
-export type { WorkflowExecutor, NodeRunner } from "./executor/types.ts";
+export type { NodeRunner, WorkflowExecutor } from "./executor/types.ts";

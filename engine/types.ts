@@ -40,9 +40,9 @@ export interface Trigger {
   path?: string;
   subject?: string;
   // webhook-specific fields
-  provider?: string;   // e.g. "github"
-  event?: string;      // e.g. "pull_request"
-  actions?: string[];  // e.g. ["opened", "synchronize", "reopened"]
+  provider?: string; // e.g. "github"
+  event?: string; // e.g. "pull_request"
+  actions?: string[]; // e.g. ["opened", "synchronize", "reopened"]
 }
 
 export interface NodeSpec {
@@ -132,8 +132,8 @@ export interface DependencyConnection {
   secret?: string;
   // Protocol-specific fields
   database?: string; // postgresql
-  user?: string;     // postgresql
-  subject?: string;  // nats
+  user?: string; // postgresql
+  subject?: string; // nats
   container?: string; // blob
   // Convenience method for HTTPS dependencies
   fetch?(path: string, init?: RequestInit): Promise<Response>;

@@ -40,6 +40,6 @@ func runRun(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("running workflow: %w", err)
 	}
 
-	fmt.Fprint(os.Stdout, string(result.Output))
+	_, _ = fmt.Fprint(os.Stdout, string(result.Output))
 	return nil
 }

@@ -11,12 +11,12 @@
 import { parse as parseFlags } from "std/flags";
 import { parse as parseYaml } from "std/yaml";
 import { dirname, resolve } from "std/path";
-import type { WorkflowSpec, Context } from "../types.ts";
+import type { Context, WorkflowSpec } from "../types.ts";
 import { compile } from "../compiler/mod.ts";
 import { SimpleExecutor } from "../executor/simple.ts";
 import { loadAllNodes, loadNode } from "../loader.ts";
 import { createMockContext, type MockContext } from "./mocks.ts";
-import { loadFixture, findFixtures } from "./fixtures.ts";
+import { findFixtures, loadFixture } from "./fixtures.ts";
 import type { NodeRunner } from "../executor/types.ts";
 import { detectDrift, formatDriftReport } from "./drift.ts";
 
@@ -28,7 +28,9 @@ const flags = parseFlags(Deno.args, {
 
 const workflowPath = flags.workflow;
 if (!workflowPath) {
-  console.error("Usage: deno run engine/testing/runner.ts --workflow <path> [--node <name>] [--pipeline]");
+  console.error(
+    "Usage: deno run engine/testing/runner.ts --workflow <path> [--node <name>] [--pipeline]",
+  );
   Deno.exit(1);
 }
 
@@ -68,10 +70,14 @@ const driftReport = aggregateContextsAndDetectDrift();
 // Output results
 const jsonOutput = flags.output === "json" || flags.o === "json";
 if (jsonOutput) {
-  console.log(JSON.stringify({
-    testResults: results,
-    drift: driftReport,
-  }, null, 2));
+  console.log(JSON.stringify(
+    {
+      testResults: results,
+      drift: driftReport,
+    },
+    null,
+    2,
+  ));
 } else {
   // Print test results
   console.log("\n─── Test Results ───");

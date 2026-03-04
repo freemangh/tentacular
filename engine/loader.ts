@@ -1,4 +1,4 @@
-import type { NodeModule, NodeFunction } from "./types.ts";
+import type { NodeFunction, NodeModule } from "./types.ts";
 import { resolve } from "std/path";
 
 /** Cache of loaded node modules, keyed by absolute path */
@@ -26,9 +26,7 @@ export async function loadNode(
     if (cached) return cached;
   }
 
-  const importPath = bustCache
-    ? `file://${absPath}?t=${Date.now()}`
-    : `file://${absPath}`;
+  const importPath = bustCache ? `file://${absPath}?t=${Date.now()}` : `file://${absPath}`;
 
   const mod = (await import(importPath)) as NodeModule;
 

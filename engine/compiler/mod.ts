@@ -26,7 +26,9 @@ function validateSpec(spec: WorkflowSpec): void {
     throw new Error('Workflow spec missing required field: "name"');
   }
   if (!spec.nodes || typeof spec.nodes !== "object" || Object.keys(spec.nodes).length === 0) {
-    throw new Error('Workflow spec missing required field: "nodes" (must define at least one node)');
+    throw new Error(
+      'Workflow spec missing required field: "nodes" (must define at least one node)',
+    );
   }
   if (!Array.isArray(spec.edges)) {
     throw new Error('Workflow spec missing required field: "edges" (must be an array)');

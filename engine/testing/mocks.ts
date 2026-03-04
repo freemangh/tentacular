@@ -1,4 +1,4 @@
-import type { Context, Logger, DependencyConnection } from "../types.ts";
+import type { Context, DependencyConnection, Logger } from "../types.ts";
 
 /** Log entry captured by the mock context */
 export interface LogEntry {
@@ -70,9 +70,11 @@ export function createMockContext(options?: CreateMockContextOptions): MockConte
       const mockResponse = fetchResponses.get(key);
       if (mockResponse) return Promise.resolve(mockResponse);
 
-      return Promise.resolve(new Response(JSON.stringify({ mock: true, service, path }), {
-        headers: { "content-type": "application/json" },
-      }));
+      return Promise.resolve(
+        new Response(JSON.stringify({ mock: true, service, path }), {
+          headers: { "content-type": "application/json" },
+        }),
+      );
     },
     log: logger,
     config: {},
@@ -88,7 +90,7 @@ export function createMockContext(options?: CreateMockContextOptions): MockConte
       // Check if contract declares this dependency (for strict enforcement)
       if (contractSpec && !contractSpec.dependencies[name]) {
         throw new Error(
-          `Dependency "${name}" not declared in contract. Add it to workflow.yaml contract.dependencies.`
+          `Dependency "${name}" not declared in contract. Add it to workflow.yaml contract.dependencies.`,
         );
       }
 
@@ -149,9 +151,11 @@ export function createMockContext(options?: CreateMockContextOptions): MockConte
         if (isHttpLike) {
           contractDep.fetch = (path: string, _init?: RequestInit): Promise<Response> => {
             access!.fetches.push(path);
-            return Promise.resolve(new Response(JSON.stringify({ mock: true, dependency: name, path }), {
-              headers: { "content-type": "application/json" },
-            }));
+            return Promise.resolve(
+              new Response(JSON.stringify({ mock: true, dependency: name, path }), {
+                headers: { "content-type": "application/json" },
+              }),
+            );
           };
         }
 
@@ -167,9 +171,11 @@ export function createMockContext(options?: CreateMockContextOptions): MockConte
         secret: undefined,
         fetch: (path: string, _init?: RequestInit): Promise<Response> => {
           access!.fetches.push(path);
-          return Promise.resolve(new Response(JSON.stringify({ mock: true, dependency: name, path }), {
-            headers: { "content-type": "application/json" },
-          }));
+          return Promise.resolve(
+            new Response(JSON.stringify({ mock: true, dependency: name, path }), {
+              headers: { "content-type": "application/json" },
+            }),
+          );
         },
       };
 

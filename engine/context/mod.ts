@@ -1,7 +1,7 @@
-import type { Context, Logger, DependencyConnection } from "../types.ts";
-import type { ContextOptions, SecretsConfig, ContractSpec } from "./types.ts";
+import type { Context, DependencyConnection, Logger } from "../types.ts";
+import type { ContextOptions, ContractSpec, SecretsConfig } from "./types.ts";
 
-export type { Context, ContextOptions, SecretsConfig, ContractSpec };
+export type { Context, ContextOptions, ContractSpec, SecretsConfig };
 
 /** Create a Context object for a node execution */
 export function createContext(opts: ContextOptions = {}): Context {

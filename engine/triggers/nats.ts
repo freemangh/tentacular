@@ -115,7 +115,11 @@ export async function startNATSTriggers(opts: NATSTriggerOptions): Promise<NATST
           }
 
           console.log(`NATS message on ${trigger.subject} — executing workflow`);
-          sink.record({ type: "nats-message", timestamp: Date.now(), metadata: { subject: trigger.subject } });
+          sink.record({
+            type: "nats-message",
+            timestamp: Date.now(),
+            metadata: { subject: trigger.subject },
+          });
           const result = await executor.execute(opts.graph, opts.runner, opts.ctx, input);
 
           // Request-reply: send result back if reply subject is set
