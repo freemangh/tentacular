@@ -67,12 +67,12 @@ func emitText(result CommandResult, w io.Writer) error {
 	if result.Status == "fail" {
 		icon = "FAIL"
 	}
-	fmt.Fprintf(w, "[%s] %s\n", icon, result.Summary)
+	_, _ = fmt.Fprintf(w, "[%s] %s\n", icon, result.Summary)
 	for _, hint := range result.Hints {
-		fmt.Fprintf(w, "  hint: %s\n", hint)
+		_, _ = fmt.Fprintf(w, "  hint: %s\n", hint)
 	}
 	if result.Timing.DurationMs > 0 {
-		fmt.Fprintf(w, "  (%dms)\n", result.Timing.DurationMs)
+		_, _ = fmt.Fprintf(w, "  (%dms)\n", result.Timing.DurationMs)
 	}
 	return nil
 }
