@@ -65,3 +65,23 @@ jobs:
       - name: Format check
         working-directory: engine
         run: deno fmt --check
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests with coverage
+        run: go test ./... -count=1 -race -coverprofile=coverage.out -covermode=atomic
+
+      - uses: codecov/codecov-action@v5
+        with:
+          files: coverage.out
+          fail_ci_if_error: false
+          # Tokenless mode for public repos. To switch to token-based:
+          # token: ${{ secrets.CODECOV_TOKEN }}
