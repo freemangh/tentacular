@@ -11,10 +11,12 @@ Deno.test("mock context: supports custom auth types", () => {
     port: 443,
     authType: "hmac-sha256",
     secret: "test-key",
-    fetch: async (path: string) => {
-      return new Response(JSON.stringify({ mock: true, path }), {
-        headers: { "content-type": "application/json" },
-      });
+    fetch: (path: string) => {
+      return Promise.resolve(
+        new Response(JSON.stringify({ mock: true, path }), {
+          headers: { "content-type": "application/json" },
+        }),
+      );
     },
   });
 
@@ -33,10 +35,12 @@ Deno.test("mock context: supports OAuth2 auth type", () => {
     port: 443,
     authType: "oauth2-client-credentials",
     secret: "client-secret-abc",
-    fetch: async (path: string) => {
-      return new Response(JSON.stringify({ mock: true, path }), {
-        headers: { "content-type": "application/json" },
-      });
+    fetch: (path: string) => {
+      return Promise.resolve(
+        new Response(JSON.stringify({ mock: true, path }), {
+          headers: { "content-type": "application/json" },
+        }),
+      );
     },
   });
 
@@ -55,14 +59,16 @@ Deno.test("mock context: fetch does not auto-inject auth headers", async () => {
     port: 443,
     authType: "bearer-token",
     secret: "test-token",
-    fetch: async (path: string, init?: RequestInit) => {
+    fetch: (path: string, init?: RequestInit) => {
       // Verify no Authorization header was added
       const headers = new Headers(init?.headers);
       assertEquals(headers.get("Authorization"), null);
 
-      return new Response(JSON.stringify({ mock: true, path }), {
-        headers: { "content-type": "application/json" },
-      });
+      return Promise.resolve(
+        new Response(JSON.stringify({ mock: true, path }), {
+          headers: { "content-type": "application/json" },
+        }),
+      );
     },
   });
 

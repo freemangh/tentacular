@@ -5,7 +5,7 @@
  * record() is O(1). snapshot() is O(n) where n = min(recorded, capacity).
  */
 
-import type { TelemetryEvent, TelemetrySnapshot, TelemetrySink } from "./types.ts";
+import type { TelemetryEvent, TelemetrySink, TelemetrySnapshot } from "./types.ts";
 
 const RING_BUFFER_CAPACITY = 1000;
 

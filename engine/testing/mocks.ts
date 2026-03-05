@@ -1,4 +1,4 @@
-import type { Context, Logger, DependencyConnection } from "../types.ts";
+import type { Context, DependencyConnection, Logger } from "../types.ts";
 
 /** Log entry captured by the mock context */
 export interface LogEntry {
@@ -62,17 +62,19 @@ export function createMockContext(options?: CreateMockContextOptions): MockConte
   const fetchResponses = new Map<string, Response>();
 
   const ctx: MockContext = {
-    fetch: async (service: string, path: string, _init?: RequestInit): Promise<Response> => {
+    fetch: (service: string, path: string, _init?: RequestInit): Promise<Response> => {
       // Record direct fetch call for bypass detection
       fetchCalls.push({ service, path });
 
       const key = `${service}:${path}`;
       const mockResponse = fetchResponses.get(key);
-      if (mockResponse) return mockResponse;
+      if (mockResponse) return Promise.resolve(mockResponse);
 
-      return new Response(JSON.stringify({ mock: true, service, path }), {
-        headers: { "content-type": "application/json" },
-      });
+      return Promise.resolve(
+        new Response(JSON.stringify({ mock: true, service, path }), {
+          headers: { "content-type": "application/json" },
+        }),
+      );
     },
     log: logger,
     config: {},
@@ -88,7 +90,7 @@ export function createMockContext(options?: CreateMockContextOptions): MockConte
       // Check if contract declares this dependency (for strict enforcement)
       if (contractSpec && !contractSpec.dependencies[name]) {
         throw new Error(
-          `Dependency "${name}" not declared in contract. Add it to workflow.yaml contract.dependencies.`
+          `Dependency "${name}" not declared in contract. Add it to workflow.yaml contract.dependencies.`,
         );
       }
 
@@ -147,11 +149,13 @@ export function createMockContext(options?: CreateMockContextOptions): MockConte
 
         // Add fetch convenience method for HTTP-like dependencies
         if (isHttpLike) {
-          contractDep.fetch = async (path: string, _init?: RequestInit): Promise<Response> => {
+          contractDep.fetch = (path: string, _init?: RequestInit): Promise<Response> => {
             access!.fetches.push(path);
-            return new Response(JSON.stringify({ mock: true, dependency: name, path }), {
-              headers: { "content-type": "application/json" },
-            });
+            return Promise.resolve(
+              new Response(JSON.stringify({ mock: true, dependency: name, path }), {
+                headers: { "content-type": "application/json" },
+              }),
+            );
           };
         }
 
@@ -165,11 +169,13 @@ export function createMockContext(options?: CreateMockContextOptions): MockConte
         port: 443,
         authType: "test-auth",
         secret: undefined,
-        fetch: async (path: string, _init?: RequestInit): Promise<Response> => {
+        fetch: (path: string, _init?: RequestInit): Promise<Response> => {
           access!.fetches.push(path);
-          return new Response(JSON.stringify({ mock: true, dependency: name, path }), {
-            headers: { "content-type": "application/json" },
-          });
+          return Promise.resolve(
+            new Response(JSON.stringify({ mock: true, dependency: name, path }), {
+              headers: { "content-type": "application/json" },
+            }),
+          );
         },
       };
 

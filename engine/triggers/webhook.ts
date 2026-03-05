@@ -146,7 +146,9 @@ export async function handleGitHubWebhook(
   const trigger = findMatchingTrigger(opts.triggers, "github", event, action);
   if (!trigger) {
     console.log(
-      `[webhook] No matching trigger for github event="${event}" action="${action ?? "none"}" — dropping`,
+      `[webhook] No matching trigger for github event="${event}" action="${
+        action ?? "none"
+      }" — dropping`,
     );
     return new Response(JSON.stringify({ ok: true, matched: false }), {
       status: 200,
@@ -155,7 +157,9 @@ export async function handleGitHubWebhook(
   }
 
   console.log(
-    `[webhook] Matched trigger for github event="${event}" action="${action ?? "none"}" delivery=${deliveryId}`,
+    `[webhook] Matched trigger for github event="${event}" action="${
+      action ?? "none"
+    }" delivery=${deliveryId}`,
   );
 
   // Enrich input with trigger metadata

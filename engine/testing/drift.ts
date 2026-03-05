@@ -5,7 +5,7 @@
  * declared contract dependencies to detect drift and contract violations.
  */
 
-import type { MockContext, DependencyAccess } from "./mocks.ts";
+import type { DependencyAccess, MockContext } from "./mocks.ts";
 import type { ContractSpec } from "../context/types.ts";
 
 export interface DriftReport {

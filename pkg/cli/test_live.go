@@ -44,7 +44,7 @@ func runLiveTest(cmd *cobra.Command, args []string) error {
 	// Determine status output writer (stderr when -o json)
 	w := StatusWriter(cmd)
 
-	fmt.Fprintf(w, "Live test: environment=%s, namespace=%s\n", envName, env.Namespace)
+	_, _ = fmt.Fprintf(w, "Live test: environment=%s, namespace=%s\n", envName, env.Namespace)
 
 	// Resolve MCP client
 	mcpClient, err := requireMCPClient(cmd)
@@ -81,20 +81,20 @@ func runLiveTest(cmd *cobra.Command, args []string) error {
 	// Cleanup on exit unless --keep
 	if !keep {
 		defer func() {
-			fmt.Fprintf(w, "Cleaning up %s from %s...\n", deployResult.WorkflowName, deployResult.Namespace)
+			_, _ = fmt.Fprintf(w, "Cleaning up %s from %s...\n", deployResult.WorkflowName, deployResult.Namespace)
 			removeResult, delErr := deployResult.MCPClient.WfRemove(context.Background(), deployResult.Namespace, deployResult.WorkflowName)
 			if delErr != nil {
 				fmt.Fprintf(os.Stderr, "Warning: cleanup failed: %v\n", delErr)
 			} else {
 				for _, d := range removeResult.Deleted {
-					fmt.Fprintf(w, "  deleted %s\n", d)
+					_, _ = fmt.Fprintf(w, "  deleted %s\n", d)
 				}
 			}
 		}()
 	}
 
 	// Trigger workflow run (MCP server handles readiness wait internally)
-	fmt.Fprintf(w, "Running workflow %s (timeout: %s)...\n", deployResult.WorkflowName, timeout)
+	_, _ = fmt.Fprintf(w, "Running workflow %s (timeout: %s)...\n", deployResult.WorkflowName, timeout)
 	runResult, err := deployResult.MCPClient.WfRun(cmd.Context(), deployResult.Namespace, deployResult.WorkflowName, nil, int(timeout.Seconds()))
 	if err != nil {
 		return emitLiveResult(cmd, "fail", "workflow run failed: "+err.Error(), nil, startedAt)

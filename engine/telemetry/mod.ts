@@ -7,10 +7,10 @@
  * The active sink is created from the TELEMETRY_SINK env var (default "basic").
  */
 
-export type { TelemetryEvent, TelemetrySnapshot, TelemetrySink } from "./types.ts";
+export type { TelemetryEvent, TelemetrySink, TelemetrySnapshot } from "./types.ts";
 export { BasicSink } from "./basic.ts";
 
-import type { TelemetryEvent, TelemetrySnapshot, TelemetrySink } from "./types.ts";
+import type { TelemetryEvent, TelemetrySink, TelemetrySnapshot } from "./types.ts";
 import { BasicSink } from "./basic.ts";
 
 /** NoopSink — zero-cost implementation; all methods are no-ops. */

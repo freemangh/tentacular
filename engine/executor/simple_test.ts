@@ -1,16 +1,20 @@
 import { assertEquals } from "std/assert";
 import { SimpleExecutor } from "./simple.ts";
 import { compile } from "../compiler/mod.ts";
-import type { WorkflowSpec, Context } from "../types.ts";
+import type { Context, WorkflowSpec } from "../types.ts";
 import type { NodeRunner } from "./types.ts";
 import { createMockContext } from "../testing/mocks.ts";
 
 function makeRunner(handlers: Record<string, (input: unknown) => unknown>): NodeRunner {
   return {
-    async run(nodeId: string, _ctx: Context, input: unknown): Promise<unknown> {
+    run(nodeId: string, _ctx: Context, input: unknown): Promise<unknown> {
       const handler = handlers[nodeId];
-      if (!handler) throw new Error(`No handler for ${nodeId}`);
-      return handler(input);
+      if (!handler) return Promise.reject(new Error(`No handler for ${nodeId}`));
+      try {
+        return Promise.resolve(handler(input));
+      } catch (err) {
+        return Promise.reject(err);
+      }
     },
   };
 }
@@ -104,9 +108,9 @@ Deno.test("SimpleExecutor: parallel nodes in same stage", async () => {
 
   const executionOrder: string[] = [];
   const runner: NodeRunner = {
-    async run(nodeId: string, _ctx: Context, input: unknown): Promise<unknown> {
+    run(nodeId: string, _ctx: Context, _input: unknown): Promise<unknown> {
       executionOrder.push(nodeId);
-      return { nodeId };
+      return Promise.resolve({ nodeId });
     },
   };
 
@@ -127,10 +131,10 @@ Deno.test("SimpleExecutor: retry with exponential backoff", async () => {
 
   let attempts = 0;
   const runner: NodeRunner = {
-    async run(): Promise<unknown> {
+    run(): Promise<unknown> {
       attempts++;
-      if (attempts < 3) throw new Error(`fail attempt ${attempts}`);
-      return { ok: true };
+      if (attempts < 3) return Promise.reject(new Error(`fail attempt ${attempts}`));
+      return Promise.resolve({ ok: true });
     },
   };
 
@@ -149,9 +153,9 @@ Deno.test("SimpleExecutor: retry exhausted returns failure", async () => {
 
   let attempts = 0;
   const runner: NodeRunner = {
-    async run(): Promise<unknown> {
+    run(): Promise<unknown> {
       attempts++;
-      throw new Error("always fails");
+      return Promise.reject(new Error("always fails"));
     },
   };
 
@@ -163,21 +167,26 @@ Deno.test("SimpleExecutor: retry exhausted returns failure", async () => {
   assertEquals(result.errors["a"]?.includes("always fails"), true);
 });
 
-Deno.test({ name: "SimpleExecutor: timeout", sanitizeOps: false, sanitizeResources: false, fn: async () => {
-  const spec = makeSpec({ a: { path: "./a.ts" } }, []);
-  const graph = compile(spec);
-  const ctx = createMockContext();
+Deno.test({
+  name: "SimpleExecutor: timeout",
+  sanitizeOps: false,
+  sanitizeResources: false,
+  fn: async () => {
+    const spec = makeSpec({ a: { path: "./a.ts" } }, []);
+    const graph = compile(spec);
+    const ctx = createMockContext();
 
-  const runner: NodeRunner = {
-    async run(): Promise<unknown> {
-      await new Promise((r) => setTimeout(r, 5000));
-      return {};
-    },
-  };
+    const runner: NodeRunner = {
+      async run(): Promise<unknown> {
+        await new Promise((r) => setTimeout(r, 5000));
+        return {};
+      },
+    };
 
-  const executor = new SimpleExecutor({ timeoutMs: 100 });
-  const result = await executor.execute(graph, runner, ctx);
+    const executor = new SimpleExecutor({ timeoutMs: 100 });
+    const result = await executor.execute(graph, runner, ctx);
 
-  assertEquals(result.success, false);
-  assertEquals(result.errors["a"]?.includes("timed out"), true);
-}});
+    assertEquals(result.success, false);
+    assertEquals(result.errors["a"]?.includes("timed out"), true);
+  },
+});

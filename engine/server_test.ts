@@ -18,8 +18,8 @@ function makeSpec(): WorkflowSpec {
 
 function makeRunner(): NodeRunner {
   return {
-    async run(): Promise<unknown> {
-      return { ok: true };
+    run(): Promise<unknown> {
+      return Promise.resolve({ ok: true });
     },
   };
 }
@@ -95,7 +95,11 @@ Deno.test("server: GET /health?detail=1 reflects recorded events", async () => {
   const sink = new BasicSink();
   // Record events before the server responds
   sink.record({ type: "node-start", timestamp: Date.now(), metadata: { node: "a" } });
-  sink.record({ type: "node-error", timestamp: Date.now(), metadata: { node: "a", error: "boom" } });
+  sink.record({
+    type: "node-error",
+    timestamp: Date.now(),
+    metadata: { node: "a", error: "boom" },
+  });
 
   const server = startServer({ port: 0, graph, runner: makeRunner(), ctx, sink });
 
@@ -160,7 +164,11 @@ Deno.test("server: GET /health?detail=1 lastRunFailed is true after failed run",
   const sink = new BasicSink();
   // Simulate a completed run that had a node-error: request-in, node-error, request-out
   sink.record({ type: "request-in", timestamp: Date.now() });
-  sink.record({ type: "node-error", timestamp: Date.now(), metadata: { node: "a", error: "boom" } });
+  sink.record({
+    type: "node-error",
+    timestamp: Date.now(),
+    metadata: { node: "a", error: "boom" },
+  });
   sink.record({ type: "request-out", timestamp: Date.now() });
 
   const server = startServer({ port: 0, graph, runner: makeRunner(), ctx, sink });
@@ -214,7 +222,11 @@ Deno.test("server: GET /health?detail=1 lastRunFailed resets after successful ru
     const addr = server.addr as Deno.NetAddr;
     const resp = await fetch(`http://localhost:${addr.port}/health?detail=1`);
     const body = await resp.json();
-    assertEquals(body.lastRunFailed, false, "lastRunFailed must reset to false after successful run");
+    assertEquals(
+      body.lastRunFailed,
+      false,
+      "lastRunFailed must reset to false after successful run",
+    );
     assertEquals(body.inFlight, 0);
   } finally {
     await server.shutdown();

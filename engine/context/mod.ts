@@ -1,7 +1,7 @@
-import type { Context, Logger, DependencyConnection } from "../types.ts";
-import type { ContextOptions, SecretsConfig, ContractSpec } from "./types.ts";
+import type { Context, DependencyConnection, Logger } from "../types.ts";
+import type { ContextOptions, ContractSpec, SecretsConfig } from "./types.ts";
 
-export type { Context, ContextOptions, SecretsConfig, ContractSpec };
+export type { Context, ContextOptions, ContractSpec, SecretsConfig };
 
 /** Create a Context object for a node execution */
 export function createContext(opts: ContextOptions = {}): Context {
@@ -46,7 +46,7 @@ function createLogger(nodeId: string): Logger {
 function createFetch(
   secrets: SecretsConfig,
 ): (service: string, path: string, init?: RequestInit) => Promise<Response> {
-  return async (service: string, path: string, init?: RequestInit): Promise<Response> => {
+  return (service: string, path: string, init?: RequestInit): Promise<Response> => {
     const serviceSecrets = secrets[service];
     const headers = new Headers(init?.headers);
 
@@ -123,7 +123,7 @@ function createDependencyAccessor(
 
     // Add convenience fetch method for HTTPS dependencies
     if (dep.protocol === "https") {
-      conn.fetch = async (path: string, init?: RequestInit): Promise<Response> => {
+      conn.fetch = (path: string, init?: RequestInit): Promise<Response> => {
         const url = `https://${dep.host}:${port}${path}`;
         return globalThis.fetch(url, init);
       };

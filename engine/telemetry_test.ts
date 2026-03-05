@@ -1,8 +1,8 @@
 import { assertEquals, assertExists, assertGreater } from "std/assert";
-import { NoopSink, BasicSink, NewTelemetrySink } from "./telemetry/mod.ts";
+import { BasicSink, NewTelemetrySink, NoopSink } from "./telemetry/mod.ts";
 import { SimpleExecutor } from "./executor/simple.ts";
 import { compile } from "./compiler/mod.ts";
-import type { WorkflowSpec, Context } from "./types.ts";
+import type { Context, WorkflowSpec } from "./types.ts";
 import type { NodeRunner } from "./executor/types.ts";
 import { createMockContext } from "./testing/mocks.ts";
 
@@ -181,7 +181,11 @@ Deno.test("BasicSink: lastRunFailed is false after successful run", () => {
 Deno.test("BasicSink: lastRunFailed is true after run with node-error", () => {
   const sink = new BasicSink();
   sink.record({ type: "request-in", timestamp: Date.now() });
-  sink.record({ type: "node-error", timestamp: Date.now(), metadata: { node: "a", error: "boom" } });
+  sink.record({
+    type: "node-error",
+    timestamp: Date.now(),
+    metadata: { node: "a", error: "boom" },
+  });
   sink.record({ type: "request-out", timestamp: Date.now() });
   assertEquals(sink.snapshot().lastRunFailed, true);
 });
@@ -248,8 +252,8 @@ Deno.test("SimpleExecutor: records node-start and node-complete on success", asy
   const sink = new BasicSink();
 
   const runner: NodeRunner = {
-    async run(_nodeId: string, _ctx: Context, _input: unknown): Promise<unknown> {
-      return { ok: true };
+    run(_nodeId: string, _ctx: Context, _input: unknown): Promise<unknown> {
+      return Promise.resolve({ ok: true });
     },
   };
 
@@ -271,8 +275,8 @@ Deno.test("SimpleExecutor: records node-start and node-error on failure", async 
   const sink = new BasicSink();
 
   const runner: NodeRunner = {
-    async run(): Promise<unknown> {
-      throw new Error("node failed");
+    run(): Promise<unknown> {
+      return Promise.reject(new Error("node failed"));
     },
   };
 
@@ -295,7 +299,9 @@ Deno.test("SimpleExecutor: node events include node name in metadata", async () 
   const sink = new BasicSink();
 
   const runner: NodeRunner = {
-    async run(): Promise<unknown> { return {}; },
+    run(): Promise<unknown> {
+      return Promise.resolve({});
+    },
   };
 
   const executor = new SimpleExecutor({ sink });
@@ -317,7 +323,9 @@ Deno.test("SimpleExecutor: records events for multiple nodes across stages", asy
   const sink = new BasicSink();
 
   const runner: NodeRunner = {
-    async run(nodeId: string): Promise<unknown> { return { nodeId }; },
+    run(nodeId: string): Promise<unknown> {
+      return Promise.resolve({ nodeId });
+    },
   };
 
   const executor = new SimpleExecutor({ sink });
@@ -335,7 +343,9 @@ Deno.test("SimpleExecutor: uptimeMs is non-negative after execution", async () =
   const sink = new BasicSink();
 
   const runner: NodeRunner = {
-    async run(): Promise<unknown> { return {}; },
+    run(): Promise<unknown> {
+      return Promise.resolve({});
+    },
   };
 
   const executor = new SimpleExecutor({ sink });

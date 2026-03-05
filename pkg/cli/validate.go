@@ -55,34 +55,34 @@ func runValidate(cmd *cobra.Command, args []string) error {
 
 	// Text output mode
 	if verbose {
-		fmt.Fprintf(out, "Workflow: %s (v%s)\n", wf.Name, wf.Version)
-		fmt.Fprintf(out, "Nodes:    %d\n", len(wf.Nodes))
-		fmt.Fprintf(out, "Edges:    %d\n", len(wf.Edges))
-		fmt.Fprintf(out, "Triggers: %d\n", len(wf.Triggers))
+		_, _ = fmt.Fprintf(out, "Workflow: %s (v%s)\n", wf.Name, wf.Version)
+		_, _ = fmt.Fprintf(out, "Nodes:    %d\n", len(wf.Nodes))
+		_, _ = fmt.Fprintf(out, "Edges:    %d\n", len(wf.Edges))
+		_, _ = fmt.Fprintf(out, "Triggers: %d\n", len(wf.Triggers))
 
 		// Show derived artifacts if contract exists
 		if wf.Contract != nil {
-			fmt.Fprintf(out, "\nDerived Artifacts:\n")
+			_, _ = fmt.Fprintf(out, "\nDerived Artifacts:\n")
 
 			// Secrets
 			secrets := spec.DeriveSecrets(wf.Contract)
 			if len(secrets) > 0 {
-				fmt.Fprintf(out, "  Secrets: %v\n", secrets)
+				_, _ = fmt.Fprintf(out, "  Secrets: %v\n", secrets)
 			}
 
 			// Egress Rules
 			egressRules := spec.DeriveEgressRules(wf.Contract)
 			if len(egressRules) > 0 {
-				fmt.Fprintf(out, "  Egress Rules:\n")
+				_, _ = fmt.Fprintf(out, "  Egress Rules:\n")
 				for _, rule := range egressRules {
-					fmt.Fprintf(out, "    %s:%d/%s\n", rule.Host, rule.Port, rule.Protocol)
+					_, _ = fmt.Fprintf(out, "    %s:%d/%s\n", rule.Host, rule.Port, rule.Protocol)
 				}
 			}
 
 			// Ingress Rules
 			ingressRules := spec.DeriveIngressRules(wf)
 			if len(ingressRules) > 0 {
-				fmt.Fprintf(out, "  Ingress Rules:\n")
+				_, _ = fmt.Fprintf(out, "  Ingress Rules:\n")
 				for _, rule := range ingressRules {
 					if rule.FromLabels != nil {
 						var labels string
@@ -92,17 +92,17 @@ func runValidate(cmd *cobra.Command, args []string) error {
 							}
 							labels += fmt.Sprintf("%s=%s", k, v)
 						}
-						fmt.Fprintf(out, "    %d/%s (from: %s)\n", rule.Port, rule.Protocol, labels)
+						_, _ = fmt.Fprintf(out, "    %d/%s (from: %s)\n", rule.Port, rule.Protocol, labels)
 					} else {
-						fmt.Fprintf(out, "    %d/%s\n", rule.Port, rule.Protocol)
+						_, _ = fmt.Fprintf(out, "    %d/%s\n", rule.Port, rule.Protocol)
 					}
 				}
 			}
 		}
-		fmt.Fprintf(out, "\n")
+		_, _ = fmt.Fprintf(out, "\n")
 	}
 
-	fmt.Fprintf(out, "✓ %s is valid\n", specPath)
+	_, _ = fmt.Fprintf(out, "✓ %s is valid\n", specPath)
 	return nil
 }
 
@@ -173,6 +173,6 @@ func outputValidateJSON(wf *spec.Workflow, out io.Writer) error {
 	if err != nil {
 		return fmt.Errorf("marshaling JSON: %w", err)
 	}
-	fmt.Fprintln(out, string(data))
+	_, _ = fmt.Fprintln(out, string(data))
 	return nil
 }

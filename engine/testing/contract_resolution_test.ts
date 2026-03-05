@@ -105,7 +105,7 @@ Deno.test("Mock context throws on undeclared dependency when contract present", 
   } catch (err) {
     assertEquals(
       (err as Error).message,
-      'Dependency "undeclared-api" not declared in contract. Add it to workflow.yaml contract.dependencies.'
+      'Dependency "undeclared-api" not declared in contract. Add it to workflow.yaml contract.dependencies.',
     );
   }
 });
