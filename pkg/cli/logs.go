@@ -19,7 +19,7 @@ func NewLogsCmd() *cobra.Command {
 
 func runLogs(cmd *cobra.Command, args []string) error {
 	name := args[0]
-	namespace, _ := cmd.Flags().GetString("namespace")
+	namespace := resolveNamespace(cmd, ".")
 	tailLines, _ := cmd.Flags().GetInt64("tail")
 
 	mcpClient, err := requireMCPClient(cmd)

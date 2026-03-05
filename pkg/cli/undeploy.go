@@ -22,7 +22,7 @@ func NewUndeployCmd() *cobra.Command {
 
 func runUndeploy(cmd *cobra.Command, args []string) error {
 	name := args[0]
-	namespace, _ := cmd.Flags().GetString("namespace")
+	namespace := resolveNamespace(cmd, ".")
 	yes, _ := cmd.Flags().GetBool("yes")
 
 	if !yes {

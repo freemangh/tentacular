@@ -243,6 +243,30 @@ type ClusterPreflightResult struct {
 	AllPass bool          `json:"allPass"`
 }
 
+// UnmarshalJSON handles both "results" and "checks" field names from the MCP server.
+func (r *ClusterPreflightResult) UnmarshalJSON(data []byte) error {
+	// Try canonical form first
+	type alias ClusterPreflightResult
+	var a alias
+	if err := json.Unmarshal(data, &a); err != nil {
+		return err
+	}
+	*r = ClusterPreflightResult(a)
+
+	// If Results is empty, try "checks" field
+	if len(r.Results) == 0 {
+		var alt struct {
+			Checks  []CheckResult `json:"checks"`
+			AllPass bool          `json:"allPass"`
+		}
+		if err := json.Unmarshal(data, &alt); err == nil && len(alt.Checks) > 0 {
+			r.Results = alt.Checks
+			r.AllPass = alt.AllPass
+		}
+	}
+	return nil
+}
+
 // ClusterPreflight calls the cluster_preflight MCP tool.
 func (c *Client) ClusterPreflight(ctx context.Context, namespace string) (*ClusterPreflightResult, error) {
 	raw, err := c.CallTool(ctx, "cluster_preflight", ClusterPreflightParams{Namespace: namespace})

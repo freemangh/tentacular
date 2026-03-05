@@ -25,6 +25,7 @@ type MCPConfig struct {
 
 // TentacularConfig holds default configuration values.
 type TentacularConfig struct {
+	Workspace    string                       `yaml:"workspace,omitempty"` // workspace root dir (default: ~/tentacles)
 	Registry     string                       `yaml:"registry,omitempty"`
 	Namespace    string                       `yaml:"namespace,omitempty"`
 	RuntimeClass string                       `yaml:"runtime_class,omitempty"`
@@ -61,6 +62,9 @@ func LoadConfig() TentacularConfig {
 }
 
 func mergeConfig(base, override *TentacularConfig) {
+	if override.Workspace != "" {
+		base.Workspace = override.Workspace
+	}
 	if override.Registry != "" {
 		base.Registry = override.Registry
 	}
