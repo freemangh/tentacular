@@ -19,14 +19,7 @@ Deploy a single in-cluster **esm.sh** instance as a cluster-level service during
 
 ## Architecture
 
-```
-workflow pod
-  └─ Deno import("jsr:@db/postgres")
-       └─► import_map.json (ConfigMap-mounted)
-             └─► http://esm-sh.tentacular-support.svc.cluster.local
-                   └─► jsr.io / registry.npmjs.org  (first fetch only)
-                         └─► cached in emptyDir / PVC
-```
+![Module Resolution](diagrams/module-resolution.svg)
 
 ---
 

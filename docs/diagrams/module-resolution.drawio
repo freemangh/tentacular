@@ -1,0 +1,53 @@
+<mxfile host="Electron" version="29.5.2">
+  <diagram id="modres" name="Page-1">
+    <mxGraphModel dx="1200" dy="600" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Workflow Pod -->
+        <mxCell id="pod" value="Workflow Pod" style="swimlane;startSize=26;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontStyle=1;fontSize=11;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="60" width="200" height="100" as="geometry"/>
+        </mxCell>
+        <mxCell id="import_stmt" value="Deno import(&quot;jsr:@db/postgres&quot;)" style="rounded=1;whiteSpace=wrap;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Helvetica;fontSize=9;" vertex="1" parent="pod">
+          <mxGeometry x="10" y="35" width="180" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Import Map -->
+        <mxCell id="importmap" value="import_map.json&#xa;(ConfigMap-mounted)" style="rounded=1;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Helvetica;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="300" y="80" width="170" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- esm.sh proxy -->
+        <mxCell id="proxy" value="esm.sh module proxy&#xa;tentacular-support" style="swimlane;startSize=38;fillColor=#f5f5f5;strokeColor=#999999;fontFamily=Helvetica;fontStyle=1;fontSize=10;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="540" y="50" width="200" height="130" as="geometry"/>
+        </mxCell>
+        <mxCell id="cache_label" value="Cached in&#xa;emptyDir / PVC" style="rounded=1;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#999999;fontFamily=Helvetica;fontSize=9;" vertex="1" parent="proxy">
+          <mxGeometry x="20" y="50" width="160" height="40" as="geometry"/>
+        </mxCell>
+
+        <!-- Public registries -->
+        <mxCell id="registries" value="jsr.io&#xa;registry.npmjs.org" style="ellipse;shape=cloud;whiteSpace=wrap;fillColor=#e1d5e7;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="830" y="55" width="180" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Note -->
+        <mxCell id="note" value="First fetch only — subsequent&#xa;requests served from cache" style="shape=note;whiteSpace=wrap;size=14;fillColor=#fff2cc;strokeColor=#d6b656;fontFamily=Helvetica;fontSize=9;fontStyle=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="540" y="220" width="200" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Arrows -->
+        <mxCell id="e1" value="resolves via" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#666666;fontFamily=Helvetica;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="pod" target="importmap">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="rewrites to&#xa;cluster-local URL" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#666666;fontFamily=Helvetica;fontSize=9;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="importmap" target="proxy">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="outbound fetch&#xa;(cache miss)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#9673a6;fontFamily=Helvetica;fontSize=9;dashed=1;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="proxy" target="registries">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

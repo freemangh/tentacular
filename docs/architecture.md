@@ -519,31 +519,7 @@ tntc test --pipeline           Run full workflow end-to-end
 
 Trace of a workflow execution from spec to response:
 
-```
-workflow.yaml
-    │
-    ▼
-spec.Parse()               Go CLI: validate YAML, check DAG acyclicity
-    │
-    ▼
-compile(spec)              Deno Engine: Kahn's algorithm → topological sort → stages
-    │
-    ▼                      ┌─────────────────────────────────────────────┐
-POST /run                  │ SimpleExecutor.execute()                    │
-    │                      │                                             │
-    ▼                      │   Stage 1: [fetch-repos]                   │
-resolveInput()             │     → ctx.fetch("github", "/user/repos")   │
-    │                      │     → output: { repos: [...] }             │
-    ▼                      │                                             │
-runner.run(nodeId, ctx,    │   Stage 2: [summarize]                     │
-           input)          │     → input: { repos: [...] }              │
-    │                      │     → output: { summary: "..." }           │
-    ▼                      │                                             │
-ExecutionResult            │   Stage 3: [notify]                        │
-    │                      │     → input: { summary: "..." }            │
-    ▼                      │     → output: { sent: true }               │
-JSON Response              └─────────────────────────────────────────────┘
-```
+![Data Flow](diagrams/data-flow.svg)
 
 ### Concrete Example: github-digest
 
