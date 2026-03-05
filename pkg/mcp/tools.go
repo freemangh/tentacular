@@ -49,7 +49,27 @@ type WfRemoveParams struct {
 
 // WfRemoveResult is the response from wf_remove.
 type WfRemoveResult struct {
-	Deleted []string `json:"deleted"` // resource names deleted
+	Deleted      []string `json:"deleted"`       // resource names deleted
+	DeletedCount int      `json:"deletedCount"`  // populated when server returns a number
+}
+
+func (r *WfRemoveResult) UnmarshalJSON(data []byte) error {
+	// Try standard format first (deleted as []string).
+	type alias WfRemoveResult
+	var a alias
+	if err := json.Unmarshal(data, &a); err == nil && len(a.Deleted) > 0 {
+		*r = WfRemoveResult(a)
+		return nil
+	}
+	// Server may return deleted as a number (count).
+	var alt struct {
+		Deleted int `json:"deleted"`
+	}
+	if err := json.Unmarshal(data, &alt); err == nil {
+		r.DeletedCount = alt.Deleted
+		return nil
+	}
+	return fmt.Errorf("cannot parse wf_remove result: %s", string(data))
 }
 
 // WfRemove calls the wf_remove MCP tool to delete a workflow's resources.

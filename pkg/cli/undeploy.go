@@ -49,12 +49,14 @@ func runUndeploy(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("removing workflow: %w", err)
 	}
 
-	if len(result.Deleted) == 0 {
-		fmt.Printf("No resources found for %s in %s\n", name, namespace)
-	} else {
+	if len(result.Deleted) > 0 {
 		for _, d := range result.Deleted {
 			fmt.Printf("  deleted %s\n", d)
 		}
+	} else if result.DeletedCount > 0 {
+		fmt.Printf("Removed %d resource(s) for %s in %s\n", result.DeletedCount, name, namespace)
+	} else {
+		fmt.Printf("No resources found for %s in %s\n", name, namespace)
 	}
 
 	return nil
